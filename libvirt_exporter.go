@@ -24,7 +24,7 @@ import (
         "github.com/prometheus/client_golang/prometheus/promhttp"
 	"gopkg.in/alecthomas/kingpin.v2"
 
-	"github.com/kumina/libvirt_exporter/libvirt_schema"
+	"github.com/stackhpc/libvirt_exporter@nova-owner-metadata/libvirt_schema"
 )
 
 // LibvirtExporter implements a Prometheus exporter for libvirt state.
@@ -62,7 +62,7 @@ type LibvirtExporter struct {
 func NewLibvirtExporter(uri string, exportNovaMetadata bool) (*LibvirtExporter, error) {
 	var domainLabels []string
 	if exportNovaMetadata {
-		domainLabels = []string{"domain", "uuid", "name", "flavor", "project_name"}
+		domainLabels = []string{"domain", "uuid", "name", "flavor", "user_id", "project_id"}
 	} else {
 		domainLabels = []string{"domain", "uuid"}
 	}
@@ -270,9 +270,10 @@ func (e *LibvirtExporter) CollectDomain(ch chan<- prometheus.Metric, domain *lib
 		var (
 			novaName        = desc.Metadata.NovaInstance.Name
 			novaFlavor      = desc.Metadata.NovaInstance.Flavor.Name
-			novaProjectName = desc.Metadata.NovaInstance.Owner.ProjectName
+			novaUserId      = desc.Metadata.NovaInstance.Owner.Username
+			novaProjectId   = desc.Metadata.NovaInstance.Owner.ProjectName
 		)
-		domainLabelValues = []string{domainName, domainUUID, novaName, novaFlavor, novaProjectName}
+		domainLabelValues = []string{domainName, domainUUID, novaName, novaFlavor, novaUserId, novaProjectId}
 	} else {
 		domainLabelValues = []string{domainName, domainUUID}
 	}
