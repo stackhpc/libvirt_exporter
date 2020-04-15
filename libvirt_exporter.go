@@ -237,10 +237,7 @@ func (e *LibvirtExporter) CollectFromLibvirt(ch chan<- prometheus.Metric) error 
 	}
 	defer conn.Close()
 
-	// Use ListDomains() as opposed to using ListAllDomains(), as
-	// the latter is unsupported when talking to a system using
-	// libvirt 0.9.12 or older.
-	domainIds, err := conn.ListDomains()
+	doms, err := conn.ListAllDomains(libvirt.CONNECT_LIST_DOMAINS_ACTIVE|libvirt.CONNECT_LIST_DOMAINS_INACTIVE)
 	if err != nil {
 		return err
 	}
@@ -248,16 +245,13 @@ func (e *LibvirtExporter) CollectFromLibvirt(ch chan<- prometheus.Metric) error 
 	ch <- prometheus.MustNewConstMetric(
 		e.libvirtDomainsNumberDesc,
 		prometheus.GaugeValue,
-		float64(len(domainIds)))
+		float64(len(doms)))
 
-	for _, id := range domainIds {
-		domain, err := conn.LookupDomainById(id)
-		if err == nil {
-			err = e.CollectDomain(ch, domain)
-			domain.Free()
-			if err != nil {
-				return err
-			}
+	for _, domain := range doms {
+		err = e.CollectDomain(ch, &domain)
+		(&domain).Free()
+		if err != nil {
+			return err
 		}
 	}
 
