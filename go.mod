@@ -1,4 +1,4 @@
-module github.com/kumina/libvirt_exporter
+module github.com/stackhpc/libvirt_exporter
 
 go 1.12
 

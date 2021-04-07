@@ -19,7 +19,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/kumina/libvirt_exporter/libvirt_schema"
+	"github.com/stackhpc/libvirt_exporter/libvirt_schema"
 	"github.com/libvirt/libvirt-go"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
