@@ -323,6 +323,11 @@ func (e *LibvirtExporter) CollectDomain(ch chan<- prometheus.Metric, domain *lib
 		float64(info.CpuTime)/1e9,
 		domainLabelValues...)
 
+        // Don't gather disk and network statistics if domain is not running.
+        if (info.State != 1) {
+            return nil
+        }
+
 	// Report block device statistics.
 	for _, disk := range desc.Devices.Disks {
 		if disk.Device == "cdrom" || disk.Device == "fd" {
